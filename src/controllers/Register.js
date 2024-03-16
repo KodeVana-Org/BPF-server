@@ -4,6 +4,8 @@ const otpSender = require("../utils/OtpSender.js");
 const jwt = require("jsonwebtoken");
 const { renderEmailTemplate } = require("../utils/template/loginWithOtp.js");
 const validator = require("validator");
+const getNextSequenceValue = require("../utils/userIDCounter.js");
+
 
 exports.RegisterForm = async (req, res) => {
   try {
@@ -138,6 +140,9 @@ exports.VerifyOTP = async (req, res) => {
     } else {
       user = new User({ phone, password });
     }
+
+    const userID = await getNextSequenceValue("userID");
+    user.userID = userID;
     await user.save();
 
     //token-generate
@@ -168,90 +173,7 @@ exports.VerifyOTP = async (req, res) => {
   }
 };
 
-// exports.VerifyOTP = async (req, res) => {
-//   try {
-//     const { emailPhone, otp, password } = req.body;
-//     let email;
-//     let phone;
-//     let phoneNumberWithCountryCode;
-//
-//     if (!otp || !password || !emailPhone) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "All fileds are required",
-//       });
-//     }
-//
-//     if (emailPhone.includes("@")) {
-//       email = emailPhone;
-//     } else {
-//       phone = emailPhone;
-//       phoneNumberWithCountryCode = "+91" + phone;
-//     }
-//
-//     let verificationMethod;
-//     let contactInfo;
-//
-//     if (email) {
-//       verificationMethod = "email";
-//       contactInfo = email;
-//     } else {
-//       verificationMethod = "phone";
-//       contactInfo = phone;
-//     }
-//
-//     // Find the user in the OTP collection based on email or phone
-//     const userOTP = await OTP.findOne({
-//       [verificationMethod]: contactInfo,
-//     });
-//
-//     // If user not found or OTP doesn't match, return error
-//     if (!userOTP || !userOTP.otp || userOTP.otp !== otp) {
-//       return res.status(400).json({ error: "Invalid OTP or email/phone" });
-//     }
-//
-//     // Check if OTP is expired (e.g., after 5 minutes)
-//     const otpTimestamp = userOTP.createdAt.getTime();
-//     const currentTimestamp = Date.now();
-//
-//     const otpValidityDuration = 2 * 60 * 1000;
-//     if (currentTimestamp - otpTimestamp > otpValidityDuration) {
-//       await OTP.deleteOne({ _id: userOTP._id });
-//       return res.status(400).json({ error: "OTP expired" });
-//     }
-//
-//     // If OTP is valid, save the user and remove the OTP data
-//     const newUser = new User();
-//     if (email) {
-//       newUser.email = email;
-//     } else {
-//       newUser.phone = phone;
-//     }
-//     newUser.password = password;
-//     await newUser.save();
-//
-//     // Remove the user data from the OTP collection
-//     await OTP.deleteOne({ _id: userOTP._id });
-//
-//     //token-generate
-//     const token = jwt.sign(
-//       {
-//         emailPhone: contactInfo,
-//         userType: newUser.userType,
-//         id: newUser._id,
-//       },
-//       process.env.JWT_SECRET_KEY,
-//     );
-//
-//     return res
-//       .status(200)
-//       .json({ message: "User Registered  successfully", token: token });
-//   } catch (error) {
-//     console.error("Error verifying OTP:", error);
-//     return res.status(500).json({ error: "Failed to verify OTP" });
-//   }
-// };
-//
+
 exports.loginWithOtp = async (req, res) => {
   try {
     const { emailPhone } = req.body;

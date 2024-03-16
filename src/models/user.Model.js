@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
+  userID: {
+    type: String,
+    required: true,
+  },
   firstName: {
     type: String,
     validate: {
@@ -103,6 +107,7 @@ const userSchema = new mongoose.Schema({
   ps: {
     type: String,
   },
+
   gender: {
     type: String,
     enum: ["male", "female"],
@@ -110,6 +115,10 @@ const userSchema = new mongoose.Schema({
 
   otp: {
     type: String,
+  },
+
+  otpExpiration: {
+    type: Date,
   },
 
   createdAt: {

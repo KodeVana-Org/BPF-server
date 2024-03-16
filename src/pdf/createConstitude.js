@@ -1,5 +1,5 @@
 const fs = require("fs");
-const Pdf = require("../models/constitution.Model.js");
+const Pdf = require("../models/constitute.Model.js");
 const cloudinary = require("../utils/cloudinary");
 
 exports.createConstitude = async (req, res) => {
@@ -58,6 +58,49 @@ exports.getAllConstitude = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to get the constitude",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteConstitute = async (req, res) => {
+  try {
+    const visionId = req.params.visionId;
+
+    if (!visionId) {
+      return res.status(400).json({
+        success: false,
+        message: "No constitude  id provided",
+      });
+    }
+    const deletedVision = await Pdf.findById(visionId);
+
+    if (!deletedVision) {
+      return res.status(404).json({
+        success: false,
+        message: "constitude not found",
+      });
+    }
+
+    await Pdf.findByIdAndDelete(visionId);
+    const pdfUrl = deletedVision.pdfUrl;
+
+    const publicId = pdfUrl.substring(
+      pdfUrl.lastIndexOf("/") + 1,
+      pdfUrl.lastIndexOf("."),
+    );
+    const deleteResponse = await cloudinary.uploader.destroy(publicId);
+
+    return res.status(200).json({
+      success: true,
+      message: "constitude deleted successfully",
+      deletedVision,
+      deleteResponse,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete the constitude",
       error: error.message,
     });
   }
