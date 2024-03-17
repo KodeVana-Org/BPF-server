@@ -1,6 +1,13 @@
 const express = require("express");
-const app = express();
+const http = require("http");
 const cors = require("cors");
+const app = express();
+const server = http.createServer(app);
+const socketController = require("./src/socket/socket.js");
+
+const io = require("socket.io")(server);
+socketController(io);
+
 //importing routess
 const videosRoutes = require("./src/router/videoRoute.js");
 const userRoute = require("./src/router/userRoute.js");
@@ -31,11 +38,10 @@ app.use("/event", eventRotue);
 app.use("/achv", achivementRoute);
 app.use("/history", historyRotue);
 app.use("/api", usrRoute);
-app.use('/pdf', constitutionRoute)
+app.use("/pdf", constitutionRoute);
 
 // Route
 app.get("/", (req, res) => {
-  // res.send("server is serving ...!");
   return res.status(200).json({
     success: true,
     message: "server is running..",
@@ -45,7 +51,7 @@ app.get("/", (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send("Something went wrong!");
+  res.status(404).send("Route is not matching!");
 });
 
-module.exports = app;
+module.exports = server;
