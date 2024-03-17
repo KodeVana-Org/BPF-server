@@ -234,3 +234,60 @@ exports.getSinglePostById = async (req, res) => {
     });
   }
 };
+
+exports.UpdatePost = async (req, res) => {
+  try {
+    const { userId, postTitle } = req.body;
+    const postId = req.params.postId;
+    const file = req.file;
+    const user = await User.findById(userId);
+    const post = await Post.findById(postId);
+
+    if (!user || !post) {
+      return res.status(403).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (
+      user.userType !== "admin" &&
+      user.userType !== "superAdmin" &&
+      user.userType !== "post-admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Only admin can create posts",
+      });
+    }
+    let uploadedImage;
+    if (file) {
+      uploadedImage = await cloudinary.uploader.upload(file.path, {
+        folder: "post_images",
+      });
+      fs.unlinkSync(file.path);
+      // Delete old image if it exists
+      if (post.postImages) {
+        const publicId = post.postImages.match(/\/([^/]+)$/)[1]; // Extract public ID from URL
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    post.postTitles = postTitle ? postTitle : post.postTitles;
+    post.postImages = uploadedImage
+      ? uploadedImage.secure_url
+      : post.postImages;
+    await post.save();
+    return res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      post: post,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update the post",
+      error: error.message,
+    });
+  }
+};

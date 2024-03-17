@@ -9,5 +9,11 @@ router.get("/get-all-post", postRouter.getAllPost);
 router.get("/get-post-by-admin", postRouter.getPostByAdminWise);
 router.delete("/delete-post/:postId", postRouter.deletePost);
 router.get("/get-post/:postId", postRouter.getSinglePostById);
+router.put(
+  "/update/:postId",
+  upload.single("postImage"),
+  postRouter.UpdatePost,
+);
 
 module.exports = router;
+
