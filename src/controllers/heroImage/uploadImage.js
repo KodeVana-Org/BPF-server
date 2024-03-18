@@ -23,12 +23,10 @@ exports.UploadHeroImage = async (req, res) => {
     });
     const saveImage = await newHeroImage.save();
 
-    return res.status(201).json({
-      data: {
-        success: true,
-        message: "Image Uploaded Successfully",
-        image: saveImage,
-      },
+    return res.status(200).json({
+      success: true,
+      message: "Image Uploaded Successfully",
+      image: saveImage,
     });
   } catch (error) {
     return res.status(500).json({
