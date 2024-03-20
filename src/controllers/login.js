@@ -1,5 +1,5 @@
-const User = require('../models/user.Model');
-const jwt = require('jsonwebtoken')
+const User = require("../models/user.Model");
+const jwt = require("jsonwebtoken");
 
 exports.Login = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ exports.Login = async (req, res) => {
     let phone;
 
     // Check if the provided value is an email or a phone number
-    if (emailPhone.includes('@')) {
+    if (emailPhone.includes("@")) {
       email = emailPhone;
       query = { email: email };
     } else {
@@ -27,24 +27,31 @@ exports.Login = async (req, res) => {
 
     // If no user found, return error
     if (!user) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
 
     // Check if password matches
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ error: "Invalid password." });
+      return res.status(401).json({
+        success: false,
+        message: "Password is Invalid",
+      });
     }
 
     // Generate token
-    const token = jwt.sign({
-      email: email,
-      phone: phone,
-      userType: user.userType,
-      id: user._id
-    },
-      process.env.JWT_SECRET_KEY
+    const token = jwt.sign(
+      {
+        email: email,
+        phone: phone,
+        userType: user.userType,
+        id: user._id,
+      },
+      process.env.JWT_SECRET_KEY,
     );
 
     // If email is provided, return user's email; otherwise, return phone
@@ -52,7 +59,8 @@ exports.Login = async (req, res) => {
 
     return res.status(200).json({
       data: { token: token },
-      message: "Login successful.", contactInfo: contactInfo, 
+      message: "Login successful.",
+      contactInfo: contactInfo,
     });
   } catch (error) {
     console.error("Error logging in:", error);

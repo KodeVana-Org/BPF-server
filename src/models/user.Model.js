@@ -5,25 +5,11 @@ const userSchema = new mongoose.Schema({
   userID: {
     type: String,
     required: true,
+    unique: true,
+    index: true,
   },
   firstName: {
     type: String,
-    validate: {
-      validator: (value) => /^[a-zA-Z]+$/.test(value),
-      message: "First name must contain only letters (alphabetic characters)",
-    },
-    minlength: [2, "name at least contain 2 letter"],
-    maxlength: [32, "limit exceeded"],
-  },
-
-  lastName: {
-    type: String,
-    validate: {
-      validator: (value) => /^[a-zA-Z]+$/.test(value),
-      message: "Last name must contain only letters (alphabetic characters)",
-    },
-    minlength: [2, "title at least contain 2 letter"],
-    maxlength: [32, "limit exceeded"],
   },
 
   dist: {
@@ -33,12 +19,6 @@ const userSchema = new mongoose.Schema({
 
   fatherName: {
     type: String,
-    // validate: {
-    // validator: (value) => /^[a-zA-Z]+$/.test(value),
-    // message: "First name must contain only letters (alphabetic characters)",
-    // },
-    minlength: [2, "title at least contain 2 letter"],
-    maxlength: [32, "limit exceeded"],
   },
 
   profileImage: {

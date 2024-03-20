@@ -6,7 +6,6 @@ const { renderEmailTemplate } = require("../utils/template/loginWithOtp.js");
 const validator = require("validator");
 const getNextSequenceValue = require("../utils/userIDCounter.js");
 
-
 exports.RegisterForm = async (req, res) => {
   try {
     const { emailPhone } = req.body;
@@ -71,6 +70,7 @@ exports.RegisterForm = async (req, res) => {
       const htmlTemplate = renderEmailTemplate(email, otp);
       otpSender.sendOTPByEmail(email, otp, htmlTemplate);
     } else if (phoneNumberWithCountryCode) {
+      console.log(phoneNumberWithCountryCode, otp);
       otpSender.sendOTPViaSMS(phoneNumberWithCountryCode, otp);
     }
 
@@ -97,6 +97,12 @@ exports.VerifyOTP = async (req, res) => {
       throw new Error("Provide either email or phone, but not both");
     }
 
+    if (otp.length !== 4) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP must be 4 digits long",
+      });
+    }
     if (emailPhone.includes("@")) {
       email = emailPhone;
     } else {
@@ -126,10 +132,6 @@ exports.VerifyOTP = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "OTP is invalid",
-        data: {
-          message:message
-        }
-       
       });
     }
 
@@ -141,8 +143,22 @@ exports.VerifyOTP = async (req, res) => {
       user = new User({ phone, password });
     }
 
-    const userID = await getNextSequenceValue("userID");
-    user.userID = userID;
+    let uniqueID = await getNextSequenceValue("userID");
+    if (uniqueID) {
+      let existingID = await User.findOne({ userID: uniqueID });
+      while (existingID) {
+        // If the ID already exists, generate a new one until it's unique
+        uniqueID = await getNextSequenceValue("userID");
+        existingID = await User.findOne({ userID: uniqueID });
+      }
+      // At this point, uniqueID is unique and can be used
+      user.userID = uniqueID;
+      await user.save();
+      console.log("User saved with unique ID:", uniqueID);
+    } else {
+      console.error("Failed to generate a unique ID.");
+    }
+    user.userID = uniqueID;
     await user.save();
 
     //token-generate
@@ -165,14 +181,13 @@ exports.VerifyOTP = async (req, res) => {
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY);
     return res.status(200).json({
-      data: {token: token},
+      data: { token: token },
       message: "User saved successfully",
     });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
 };
-
 
 exports.loginWithOtp = async (req, res) => {
   try {
@@ -267,17 +282,17 @@ exports.verifyOtpAndLogin = async (req, res) => {
 
     if (!userOTP || userOTP.otp !== otp || (!userOTP.email && !userOTP.phone)) {
       return res.status(400).json({ error: "Invalid OTP or email/phone" });
-      console.log('Wrong OTP');
+      console.log("Wrong OTP");
     }
-    
+
     const otpValidityDuration = 3 * 60 * 1000; // 5 minutes in milliseconds
     const otpTimestamp = userOTP.createdAt.getTime();
     const currentTimestamp = Date.now();
-    
+
     if (currentTimestamp - otpTimestamp > otpValidityDuration) {
       await User.updateOne({ _id: userOTP._id }, { $unset: { otp: 1 } });
       return res.status(404).json({ error: "OTP expired" });
-      console.log('OTP expired');
+      console.log("OTP expired");
     }
 
     await User.updateOne({ _id: userOTP._id }, { $unset: { otp: 1 } });
