@@ -2,12 +2,6 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const app = express();
-const server = http.createServer(app);
-const socketController = require("./src/socket/socket.js");
-
-const io = require("socket.io")(server);
-socketController(io);
-
 //importing routess
 const videosRoutes = require("./src/router/videoRoute.js");
 const userRoute = require("./src/router/userRoute.js");
