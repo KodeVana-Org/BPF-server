@@ -3,7 +3,6 @@ const app = require("./app");
 const cors = require("cors");
 const { connectToDatabase } = require("./src/config/db.js");
 const PORT = process.env.PORT || 8000;
-
 // Middleware to handle 404 errors
 connectToDatabase();
 // Start the server

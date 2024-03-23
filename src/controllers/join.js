@@ -1,13 +1,5 @@
 const User = require("../models/user.Model");
 const Join = require("../models/join.Model");
-// const {
-// Tamulpur,
-// Baksa,
-// Chirang,
-// Kokrajhar,
-// Udalguri,
-// } = require("../models/dist.Model.js");
-const { JoinUser } = require("./join/getAllJoinUser.js");
 
 exports.Join = async (req, res) => {
   try {
