@@ -1,6 +1,7 @@
 const User = require("../models/user.Model");
 const OTP = require("../models/otp.Model");
 const otpSender = require("../utils/OtpSender");
+const forgotPassword = require("../utils/template/resetPasswordOtp.js");
 
 exports.ForgotPassword = async (req, res) => {
   try {
@@ -38,7 +39,8 @@ exports.ForgotPassword = async (req, res) => {
 
     // Here you should define or import otpSender.sendOTPByEmail and otpSender.sendOTPViaSMS functions
     if (verificationMethod === "email") {
-      otpSender.sendOTPByEmail(contactInfo, otp);
+      const htmlTemplate = forgotPassword.resetPasswordOtp(email, otp);
+      otpSender.sendOTPByEmail(contactInfo, otp, htmlTemplate);
     } else if (verificationMethod === "phone") {
       otpSender.sendOTPViaSMS(contactInfo, otp);
     }
@@ -102,8 +104,8 @@ exports.ResetPassword = async (req, res) => {
 exports.ResetPass = async (req, res) => {
   try {
     const { emailPhone, password } = req.body;
-    console.log(emailPhone)
-    console.log(password)
+    console.log(emailPhone);
+    console.log(password);
     if (!emailPhone || !password) {
       return res.status(402).json({
         success: false,
@@ -138,10 +140,10 @@ exports.ResetPass = async (req, res) => {
       email: email,
       phone: phone,
       userType: userOTP.userType,
-      id: userOTP._id
+      id: userOTP._id,
     });
     return res.status(200).json({
-      data: {token: token},
+      data: { token: token },
       message: "User saved successfully",
     });
   } catch (error) {
@@ -151,3 +153,4 @@ exports.ResetPass = async (req, res) => {
     });
   }
 };
+

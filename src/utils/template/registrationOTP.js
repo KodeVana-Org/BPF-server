@@ -1,5 +1,6 @@
-function renderEmailTemplate(email, otp) {
+function registrationOTP(email, otp) {
   const htmlTemplate = `
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -157,10 +158,6 @@ function renderEmailTemplate(email, otp) {
             </div>
           </div>
 
-
-
-
-
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
             <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ff671f;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -198,7 +195,7 @@ function renderEmailTemplate(email, otp) {
                             <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Cabin',sans-serif;" align="left">
 
                               <div style="font-size: 14px; color: #e5eaf5; line-height: 140%; text-align: center; word-wrap: break-word;">
-                                <p style="font-size: 14px; line-height: 140%;"><strong>WE ARE HAPPY TO HAVE YOU BACK !</strong></p>
+                                <p style="font-size: 14px; line-height: 140%;"><strong>T H A N K S&nbsp; &nbsp;F O R&nbsp; &nbsp;S I G N I N G&nbsp; &nbsp;U P !</strong></p>
                               </div>
 
                             </td>
@@ -231,9 +228,6 @@ function renderEmailTemplate(email, otp) {
           </div>
 
 
-
-
-
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
             <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -253,8 +247,8 @@ function renderEmailTemplate(email, otp) {
                               <div style="font-size: 14px; line-height: 160%; text-align: center; word-wrap: break-word;">
                                 <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 22px; line-height: 35.2px;">Hi, </span></p>
                                 <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 18px; line-height: 28.8px;">You're almost ready to get started.</span></p>
-                                <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 18px; line-height: 28.8px;">Your one-time-password for the email address <strong><span style="color: #046a38; line-height: 22.4px;">EMAIL</span></strong> is</span></p>
-                                <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 20px; line-height: 32px;"><span style="text-decoration: underline; line-height: 22.4px;"><strong><span style="line-height: 22.4px; color: #046a38; text-decoration: underline;">OTP</span></strong></span></span></p>
+                                <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 18px; line-height: 28.8px;">Your one-time-password for the email address <strong><span style="color: #046a38; line-height: 22.4px;">${email}</span></strong>&nbsp;is </span></p>
+                                <p style="font-size: 14px; line-height: 160%;"><span style="font-size: 20px; line-height: 32px;"><strong><span style="line-height: 22.4px; color: #046a38;">${otp}</span></strong></span></p>
                               </div>
 
                             </td>
@@ -431,7 +425,10 @@ function renderEmailTemplate(email, otp) {
 </body>
 
 </html>
+
 `;
+
   return htmlTemplate;
 }
-module.exports = { renderEmailTemplate: renderEmailTemplate };
+
+module.exports = { registrationOTP: registrationOTP };

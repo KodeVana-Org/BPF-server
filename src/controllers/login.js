@@ -6,7 +6,10 @@ exports.Login = async (req, res) => {
     const { emailPhone, password } = req.body;
 
     if (!emailPhone || !password) {
-      throw new Error("Email or phone and password are required.");
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email/phone and password.",
+      });
     }
 
     let query;
@@ -29,6 +32,7 @@ exports.Login = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
+        status: "404",
         message: "User not found.",
       });
     }
@@ -39,6 +43,7 @@ exports.Login = async (req, res) => {
     if (!isPasswordMatch) {
       return res.status(401).json({
         success: false,
+        status: "401",
         message: "Password is Invalid",
       });
     }
@@ -59,6 +64,8 @@ exports.Login = async (req, res) => {
 
     return res.status(200).json({
       data: { token: token },
+      success: true,
+      status: 200,
       message: "Login successful.",
       contactInfo: contactInfo,
     });

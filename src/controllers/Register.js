@@ -2,6 +2,7 @@ const User = require("../models/user.Model.js");
 const OTP = require("../models/otp.Model.js");
 const otpSender = require("../utils/OtpSender.js");
 const jwt = require("jsonwebtoken");
+const { registrationOTP } = require("../utils/template/registrationOTP.js");
 const { renderEmailTemplate } = require("../utils/template/loginWithOtp.js");
 const validator = require("validator");
 const getNextSequenceValue = require("../utils/userIDCounter.js");
@@ -67,7 +68,7 @@ exports.RegisterForm = async (req, res) => {
 
     // Send OTP to user via email or SMS based on verificationMethod
     if (email) {
-      const htmlTemplate = renderEmailTemplate(email, otp);
+      const htmlTemplate = registrationOTP(email, otp);
       otpSender.sendOTPByEmail(email, otp, htmlTemplate);
     } else if (phoneNumberWithCountryCode) {
       console.log(phoneNumberWithCountryCode, otp);
@@ -223,8 +224,8 @@ exports.loginWithOtp = async (req, res) => {
 
     if (!user) {
       return res
-        .status(400)
-        .json({ error: "User not found. Please register first." });
+        .status(404)
+        .json({ status: 404, error: "User not found. Please register first." });
     }
 
     const otp = Math.floor(1000 + Math.random() * 9000);
@@ -244,11 +245,14 @@ exports.loginWithOtp = async (req, res) => {
 
     return res.status(200).json({
       data: { otp },
+      status: 200,
       message: "OTP sent successfully. Please verify and login.",
     });
   } catch (error) {
     console.error("Error logging in with OTP:", error);
-    return res.status(500).json({ error: "Failed to login with OTP" });
+    return res
+      .status(500)
+      .json({ status: 500, error: "Failed to login with OTP" });
   }
 };
 
@@ -281,8 +285,9 @@ exports.verifyOtpAndLogin = async (req, res) => {
     });
 
     if (!userOTP || userOTP.otp !== otp || (!userOTP.email && !userOTP.phone)) {
-      return res.status(400).json({ error: "Invalid OTP or email/phone" });
-      console.log("Wrong OTP");
+      return res
+        .status(400)
+        .json({ status: 400, error: "Invalid OTP or email/phone" });
     }
 
     const otpValidityDuration = 3 * 60 * 1000; // 5 minutes in milliseconds
@@ -291,8 +296,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
 
     if (currentTimestamp - otpTimestamp > otpValidityDuration) {
       await User.updateOne({ _id: userOTP._id }, { $unset: { otp: 1 } });
-      return res.status(404).json({ error: "OTP expired" });
-      console.log("OTP expired");
+      return res.status(404).json({ status: 404, error: "OTP expired" });
     }
 
     await User.updateOne({ _id: userOTP._id }, { $unset: { otp: 1 } });
@@ -306,9 +310,11 @@ exports.verifyOtpAndLogin = async (req, res) => {
       process.env.JWT_SECRET_KEY,
     );
 
-    return res
-      .status(200)
-      .json({ message: "User logged in successfully", token: token });
+    return res.status(200).json({
+      status: 200,
+      message: "User logged in successfully",
+      token: token,
+    });
   } catch (error) {
     await User.updateOne({ _id: userOTP._id }, { $unset: { otp: 1 } });
     console.error("Error verifying OTP:", error);
