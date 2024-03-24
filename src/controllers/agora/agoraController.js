@@ -5,7 +5,6 @@ exports.CreateRoom = async (req, res) => {
   try {
     const { channelName } = req.body;
     const { userId } = req.params;
-    console.log("user id is ", userId);
     if (!channelName || !userId) {
       return res.status(400).json({
         success: false,
@@ -135,7 +134,6 @@ exports.getAllUserInsideChannel = async (req, res) => {
   try {
     // const { channelName } = req.params;
     const { channelName } = req.body;
-    console.log("channelName is ", channelName);
     if (!channelName) {
       return res.status(400).json({
         success: false,
@@ -180,7 +178,8 @@ exports.getAllUserInsideChannel = async (req, res) => {
 
 exports.leaveRoom = async (req, res) => {
   try {
-    const { channelName, userId } = req.body;
+    const { channelName } = req.body;
+    const { userId } = req.params;
 
     // Validate request parameters
     if (!channelName || !userId) {
@@ -190,38 +189,39 @@ exports.leaveRoom = async (req, res) => {
       });
     }
 
-    // Find the latest room by channelName
-    let room = await Room.findOne({ channelName }).sort({ createdAt: -1 });
+    // Find the room by channelName
+    const room = await Room.findOne({ channelName }).sort({ createdAt: -1 });
 
     // If the room doesn't exist, return a 404 response
     if (!room) {
       return res.status(404).json({
         success: false,
-        message: "Room does not exist",
+        message: "Room not found",
       });
     }
 
-    // Find the index of the user in the member array
-    const index = room.members.indexOf(userId);
+    // Find the index of the user in the members array
+    const userIndex = room.members.findIndex(
+      (member) => member.userId.toString() === userId,
+    );
 
-    // If the user is not in the room, return a 404 response
-    if (index === -1) {
+    // If the user is not found in the members array, return a 404 response
+    if (userIndex === -1) {
       return res.status(404).json({
         success: false,
-        message: "User is not a member of the room",
+        message: "User not found in the room",
       });
     }
 
-    // Set userActive to false for the leaving user
-    room.userActive[index] = false;
+    // Set userActive to false for the user leaving the room
+    room.members[userIndex].userActive = false;
 
-    // Save the updated room
+    // Save the updated room document
     await room.save();
 
     return res.status(200).json({
       success: true,
       message: "User left the room successfully",
-      data: room,
     });
   } catch (error) {
     console.error("Error leaving room:", error);
