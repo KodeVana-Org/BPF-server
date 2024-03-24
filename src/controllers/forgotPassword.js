@@ -1,5 +1,5 @@
 const User = require("../models/user.Model");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const OTP = require("../models/otp.Model");
 const otpSender = require("../utils/OtpSender");
 const forgotPassword = require("../utils/template/resetPasswordOtp.js");
@@ -18,7 +18,7 @@ exports.ForgotPassword = async (req, res) => {
       contactInfo = emailPhone;
     } else if (/^\+?\d+$/.test(emailPhone)) {
       verificationMethod = "phone";
-      contactInfo ="+91"+ emailPhone;
+      contactInfo = "+91" + emailPhone;
     } else {
       throw new Error("Invalid email or phone number format.");
     }
@@ -27,7 +27,7 @@ exports.ForgotPassword = async (req, res) => {
       [verificationMethod]: contactInfo,
     });
     if (!existingUser) {
-      return res.status(404).json({status:404, error: "User not found." });
+      return res.status(404).json({ status: 404, error: "User not found." });
     }
 
     const otp = Math.floor(1000 + Math.random() * 9000);
@@ -48,7 +48,7 @@ exports.ForgotPassword = async (req, res) => {
 
     return res.status(200).json({
       message: "OTP sent successfully. Please verify.",
-      status:200,
+      status: 200,
       //data: otp,
     });
   } catch (error) {
@@ -73,7 +73,7 @@ exports.ResetPassword = async (req, res) => {
       contactInfo = emailPhone;
     } else if (/^\+?\d+$/.test(emailPhone)) {
       verificationMethod = "phone";
-      contactInfo ="+91"+ emailPhone;
+      contactInfo = "+91" + emailPhone;
     } else {
       throw new Error("Invalid email or phone number format.");
     }
@@ -84,17 +84,19 @@ exports.ResetPassword = async (req, res) => {
 
     // If user not found or OTP doesn't match, return error
     if (!userOTP || userOTP.otp !== otp) {
-      return res.status(400).json({ status:404, error: "Invalid OTP or email/phone" });
+      return res
+        .status(400)
+        .json({ status: 404, error: "Invalid OTP or email/phone" });
     }
 
     // Check if OTP is expired
     const currentTimestamp = Date.now();
     if (currentTimestamp > userOTP.otpExpiration) {
-      return res.status(400).json({ status:400,error: "OTP expired" });
+      return res.status(400).json({ status: 400, error: "OTP expired" });
     }
     return res.status(201).json({
       message: "OTP sent successfully. Please verify.",
-      status:200,
+      status: 200,
       //data: otp,
     });
   } catch (error) {
@@ -119,7 +121,7 @@ exports.ResetPass = async (req, res) => {
       contactInfo = emailPhone;
     } else if (/^\+?\d+$/.test(emailPhone)) {
       verificationMethod = "phone";
-      contactInfo = "+91"+emailPhone;
+      contactInfo = "+91" + emailPhone;
     } else {
       throw new Error("Invalid email or phone number format.");
     }
@@ -134,25 +136,28 @@ exports.ResetPass = async (req, res) => {
       });
     }
     userOTP.password = password;
-      userOTP.save();
-     const token = jwt.sign({
-      phone: contactInfo,
-      email: contactInfo,
-      userType: userOTP.userType,
-      id: userOTP._id,
-    },process.env.JWT_SECRET_KEY);
+    userOTP.save();
+    const token = jwt.sign(
+      {
+        phone: contactInfo,
+        email: contactInfo,
+        userType: userOTP.userType,
+        id: userOTP._id,
+      },
+      process.env.JWT_SECRET_KEY,
+    );
 
     return res.status(200).json({
       data: { token: token },
-      status:200,
+      status: 200,
       success: true,
       message: "User Password changed successfully",
     });
   } catch (error) {
     return res.status(500).json({
-    status:500,
+      status: 500,
       success: false,
       message: " Failed to reset password",
-})
-}
-}
+    });
+  }
+};

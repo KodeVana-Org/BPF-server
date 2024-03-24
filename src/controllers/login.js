@@ -21,7 +21,7 @@ exports.Login = async (req, res) => {
       email = emailPhone;
       query = { email: email };
     } else {
-      phone = "+91"+ emailPhone;
+      phone = "+91" + emailPhone;
       query = { phone: phone };
     }
 

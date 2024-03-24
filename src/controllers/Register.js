@@ -43,7 +43,7 @@ exports.RegisterForm = async (req, res) => {
     }
     if (existingUser) {
       return res.status(403).json({
-status:403,
+        status: 403,
         success: false,
         message: "User already exist",
       });
@@ -77,7 +77,7 @@ status:403,
     }
 
     return res.status(200).json({
-status:200,
+      status: 200,
       message: "OTP sent successfully. Please verify.",
       data: otp,
     });
@@ -126,7 +126,7 @@ exports.VerifyOTP = async (req, res) => {
     const userExist = await User.exists(userQuery);
     if (userExist) {
       return res.status(404).json({
-status:404,
+        status: 404,
         success: false,
         message: "User already registerd",
       });
@@ -185,7 +185,7 @@ status:404,
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY);
     return res.status(200).json({
-status:200,
+      status: 200,
       data: { token: token },
       message: "User saved successfully",
     });
@@ -288,7 +288,7 @@ exports.verifyOtpAndLogin = async (req, res) => {
       [verificationMethod]: contactInfo,
     });
 
-    if (!userOTP || userOTP.otp !== otp ) {
+    if (!userOTP || userOTP.otp !== otp) {
       return res
         .status(400)
         .json({ status: 400, error: "Invalid OTP or email/phone" });
