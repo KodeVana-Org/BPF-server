@@ -39,7 +39,7 @@ exports.RegisterForm = async (req, res) => {
       existingUser = await User.findOne({ email: email });
     } else if (phoneNumberWithCountryCode) {
       existingOTP = await OTP.findOne({ phone: phoneNumberWithCountryCode });
-      existingUser = await User.findOne({ phone: phone });
+      existingUser = await User.findOne({ phone: phoneNumberWithCountryCode });
     }
     if (existingUser) {
       return res.status(403).json({
