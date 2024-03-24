@@ -14,7 +14,7 @@ const achivementRoute = require("./src/router/adminRoute/achievementRoute.js");
 const historyRotue = require("./src/router/historyRoute.js");
 const usrRoute = require("./src/router/adminRoute/userRoute.js");
 const constitutionRoute = require("./src/router/adminRoute/pdfRoute.js");
-const agoraRoute = require("./src/router/adminRoute/agoraRoute.js");
+const roomRoute = require("./src/router/roomRoute.js");
 
 // Middleware to log requests
 app.use(express.json());
@@ -34,7 +34,7 @@ app.use("/admin", adminRoute);
 app.use("/event", eventRotue);
 app.use("/achv", achivementRoute);
 app.use("/history", historyRotue);
-app.use("/api", usrRoute, agoraRoute);
+app.use("/api", usrRoute, roomRoute);
 app.use("/pdf", constitutionRoute);
 
 // Route
