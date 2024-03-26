@@ -55,6 +55,9 @@ const userSchema = new mongoose.Schema({
     unique: false,
   },
 
+  villageTown: {
+    type: String,
+  },
   randomToken: {
     type: String,
   },

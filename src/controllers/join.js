@@ -7,12 +7,11 @@ exports.Join = async (req, res) => {
     const existingUser = await User.findById(id);
 
     if (!existingUser) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ status: 404, message: "User not found." });
     }
 
     const {
-      firstName,
-      lastName,
+      name,
       phone,
       email,
       po,
@@ -20,6 +19,7 @@ exports.Join = async (req, res) => {
       gender,
       district,
       fatherName,
+      villageTown,
     } = req.body;
 
     // if (!email && !phone) {
@@ -28,17 +28,7 @@ exports.Join = async (req, res) => {
     // .json({ message: "Either email or phone is required." });
     // }
 
-    if (
-      !firstName ||
-      !lastName ||
-      !po ||
-      !ps ||
-      !gender ||
-      !district ||
-      !fatherName ||
-      !email ||
-      !phone
-    ) {
+    if (!name || !po || !ps || !gender || !district || !fatherName) {
       return res
         .status(400)
         .json({ message: "All fileds are required for joining " });
@@ -49,7 +39,9 @@ exports.Join = async (req, res) => {
     // }
 
     if (existingUser.userType !== "user") {
-      return res.status(400).json({ message: "Only user can join " });
+      return res
+        .status(400)
+        .json({ status: 400, message: "Only user can join " });
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -96,7 +88,7 @@ exports.Join = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User joined successfully.", updatedUser });
+      .json({ status: 200, message: "User joined successfully.", updatedUser });
   } catch (error) {
     console.error("Error joining:", error);
     return res.status(500).json({ error: "Failed to join." });
