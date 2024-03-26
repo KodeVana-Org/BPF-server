@@ -16,6 +16,7 @@ exports.auth = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      user: user,
       data: {
         message: "token verified successfully",
         email: user.email,
