@@ -223,6 +223,7 @@ exports.getSinglePostById = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      status: 200,
       message: "Post fetched successfully",
       post: post,
     });
@@ -239,14 +240,13 @@ exports.UpdatePost = async (req, res) => {
   try {
     const { userId, postTitle } = req.body;
     const postId = req.params.postId;
-    const file = req.file;
     const user = await User.findById(userId);
     const post = await Post.findById(postId);
 
     if (!user || !post) {
       return res.status(403).json({
         success: false,
-        message: "User not found",
+        message: "User or post not found",
       });
     }
 
@@ -257,28 +257,14 @@ exports.UpdatePost = async (req, res) => {
     ) {
       return res.status(403).json({
         success: false,
-        message: "Only admin can create posts",
+        message: "Only admin can update posts",
       });
-    }
-    let uploadedImage;
-    if (file) {
-      uploadedImage = await cloudinary.uploader.upload(file.path, {
-        folder: "post_images",
-      });
-      fs.unlinkSync(file.path);
-      // Delete old image if it exists
-      if (post.postImages) {
-        const publicId = post.postImages.match(/\/([^/]+)$/)[1]; // Extract public ID from URL
-        await cloudinary.uploader.destroy(publicId);
-      }
     }
 
-    post.postTitles = postTitle ? postTitle : post.postTitles;
-    post.postImages = uploadedImage
-      ? uploadedImage.secure_url
-      : post.postImages;
+    post.postTitles = postTitle || post.postTitles;
     await post.save();
     return res.status(200).json({
+      status: 200,
       success: true,
       message: "Post updated successfully",
       post: post,
