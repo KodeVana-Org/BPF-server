@@ -25,6 +25,7 @@ exports.auth = async (req, res) => {
         userType: user.userType,
         id: user._id,
         profileImage: user.profileImage ? user.profileImage : null,
+        email: user.email ? user.email : null,
         member: Memeber ? Memeber : null,
       },
     });

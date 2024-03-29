@@ -4,7 +4,7 @@ exports.getAllUser = async (req, res) => {
   try {
     const user = await User.find(
       {},
-      { email: 1, phone: 1, userType: 1, userID: 1, status: 1, _id: 0 },
+      { email: 1, phone: 1, userType: 1, userID: 1, status: 1, _id: 1 },
     );
     if (!user || user.length === 0) {
       return res.status(404).send({

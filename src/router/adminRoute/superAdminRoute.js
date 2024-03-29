@@ -11,5 +11,6 @@ router.post("/random-token/:id", randomToken.GenerateRegisterLink);
 router.post("/random-register/:id", randomToken.ValidateTokenAndSaveData);
 router.get("/user-by-dist/:district", getAllUserBydisctrict.getUserByDistrict);
 router.get("/all-user", getallUser.getAllUser);
+router.get("/single-user/:userId", UpdateUser.SingleUser);
 
 module.exports = router;
